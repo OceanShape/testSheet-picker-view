@@ -1,9 +1,10 @@
 import UIKit
 
 class ViewController: UIViewController {
-    
-    let data: [String] = ["One", "Two", "Three", "Four", "Five"]
-    
+
+    let month = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
+    let currentDateComponents = Calendar.current.dateComponents([.year], from: Date())
+
     private let pickerView: UIPickerView = {
         let view = UIPickerView()
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -40,21 +41,55 @@ class ViewController: UIViewController {
 }
 
 extension ViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+
+    // DataSource 관련 메서드
     
+    // 넣을 열의 개수(ex. 3을 반환할 경우, 3개의 선택할 수 있는 UI가 생긴다)
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
+        return 3
     }
 
+    // 각 열 별로 선택할 수 있는 개수를 지정
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return data.count
+        switch component {
+        case 0:
+            return 100
+        case 1:
+            return 12
+        case 2:
+            return 31
+        default:
+            return 0
+        }
     }
     
+    // Delegate 관련 메서드
+    
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return data[row]
+        switch component {
+        case 0:
+            return String(self.currentDateComponents.year! - row)
+        case 1:
+            return month[row]
+        case 2:
+            var component = DateComponents()
+            component.year = pickerView.selectedRow(inComponent: 0)
+            component.month = pickerView.selectedRow(inComponent: 1)
+            component.day = 1
+            
+            let year = (component.year ?? 0 > 0) ? component.year : 0
+            var date = Calendar.current.date(from: component)
+            print(date)
+
+            print(Calendar.current.date(byAdding: DateComponents(day: -1), to: date!))
+            return "NONE"
+        default:
+            return "NONE"
+        }
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        self.pickedContentLabel.text = data[row]
+        //self.pickedContentLabel.text = data[row]
     }
     
     func layoutPickerView() {
